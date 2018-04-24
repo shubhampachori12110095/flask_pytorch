@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# @Time    : 2018/4/24 10:04
+# @Author  : zhoujun
+
 import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
@@ -27,17 +31,18 @@ class Pytorch_model:
             self.idx2label = None
 
     def predict(self, img, is_numpy=True, topk=1):
-        if not is_numpy and self.img_channel in [1, 3]:
+        if not is_numpy and self.img_channel in [1, 3]: # read image
             img = cv2.imread(img, 0 if self.img_channel == 1 else 1)
-        if len(img.shape) < 3 and self.img_channel == 3:
+
+        img = cv2.resize(img, (self.img_shape[0], self.img_shape[1]))
+        if len(img.shape) == 2 and self.img_channel == 3:
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-            img = cv2.resize(img, (self.img_shape[0], self.img_shape[1]))
         elif len(img.shape) == 3 and self.img_channel == 1:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            img = img.reshape([img.shape[0], img.shape[1], self.img_channel])
         elif len(img.shape) not in [2, 3] or self.img_channel not in [1, 3]:
             raise NotImplementedError
 
+        img = img.reshape([self.img_shape[0], self.img_shape[1], self.img_channel])
         tensor = transforms.ToTensor()(img)
         tensor = tensor.unsqueeze_(0)
         tensor = Variable(tensor)
@@ -47,8 +52,9 @@ class Pytorch_model:
         else:
             tensor = tensor.cpu()
 
-        outputs = F.softmax(self.net(tensor))
+        outputs = F.softmax(self.net(tensor),dim=1)
         result = torch.topk(outputs.data[0], k=topk)
+
         if self.use_gpu:
             index = result[1].cpu().numpy().tolist()
             prob = result[0].cpu().numpy().tolist()
@@ -60,7 +66,7 @@ class Pytorch_model:
             label = []
             for idx in index:
                 label.append(self.idx2label[str(idx)])
-            result = label, prob
+            result = zip(label, prob)
         else:
-            result = index, prob
+            result = zip(index, prob)
         return result

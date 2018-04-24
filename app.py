@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# @Time    : 2018/4/24 10:04
+# @Author  : zhoujun
+
 import flask
 import time
 import cv2
@@ -5,12 +9,10 @@ import numpy as np
 from model import Pytorch_model
 
 app = flask.Flask(__name__)
-model = None
 
-
-@app.route('/')
-def helloword():
-    return 'hello'
+# @app.route('/')
+# def helloword():
+#     return 'hello'
 
 
 @app.route('/predict', methods=['POST'])
@@ -33,6 +35,9 @@ def predict():
 
 
 if __name__ == '__main__':
-    model_path = 'net.pkl'
-    model = Pytorch_model(model_path=model_path, img_shape=[28, 28], img_channel=3)
+    print("Loading PyTorch model and Flask starting server ...")
+    print("Please wait until server has fully started")
+    model_path = 'resnet18.pkl'
+    gpu_id = None
+    model = Pytorch_model(model_path=model_path, img_shape=[224, 224], img_channel=3, gpu_id=gpu_id)
     app.run(debug=True)

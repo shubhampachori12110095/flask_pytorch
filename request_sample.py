@@ -9,8 +9,11 @@ URL = 'http://127.0.0.1:5000/predict'
 def predict_result(image_path):
     img = open(image_path,'rb').read()
     msg = {'image':img}
+    params = {'topk':3}
     try:
-        r = requests.post(URL,files=msg).json()
+        r = requests.post(URL,files=msg,data=params)
+        print(r.url)
+        r = r.json()
         if r['state']:
             print('sucess',r['predictions'])
         else:

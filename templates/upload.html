@@ -1,0 +1,13 @@
+<!doctype html>
+<h1>classification demo, the model is trained with mnist dataset</h1>
+<form method=POST enctype=multipart/form-data>
+    <input type=file name=photo>
+    <input type=submit>
+</form>
+
+{% if img_path %}
+    <img src="{{ img_path }}"/>
+{% endif %}
+{% if result %}
+    {{ result }}
+{% endif %}

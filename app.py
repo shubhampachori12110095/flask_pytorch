@@ -40,4 +40,4 @@ if __name__ == '__main__':
     model_path = 'resnet18.pkl'
     gpu_id = None
     model = Pytorch_model(model_path=model_path, img_shape=[224, 224], img_channel=3, gpu_id=gpu_id)
-    app.run(debug=True)
+    app.run(debug=False)

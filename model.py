@@ -31,6 +31,9 @@ class Pytorch_model:
             self.idx2label = None
 
     def predict(self, img, is_numpy=True, topk=1):
+        if len(self.img_shape) not in [2, 3] or self.img_channel not in [1, 3]:
+            raise NotImplementedError
+
         if not is_numpy and self.img_channel in [1, 3]: # read image
             img = cv2.imread(img, 0 if self.img_channel == 1 else 1)
 
@@ -39,8 +42,7 @@ class Pytorch_model:
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
         elif len(img.shape) == 3 and self.img_channel == 1:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        elif len(img.shape) not in [2, 3] or self.img_channel not in [1, 3]:
-            raise NotImplementedError
+
 
         img = img.reshape([self.img_shape[0], self.img_shape[1], self.img_channel])
         tensor = transforms.ToTensor()(img)
